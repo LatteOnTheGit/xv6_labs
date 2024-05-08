@@ -9,6 +9,7 @@ void childFunction(int p[2]) {
     // wive out all multiples of the prime
     // create a new pipe and a new child
     // until there are no more numbers in the pipe
+    close(p[1]);
     int prime = 0;
     read(p[0], &prime, sizeof(prime));
     if (prime == 0) {
@@ -19,6 +20,7 @@ void childFunction(int p[2]) {
     int newp[2];
     pipe(newp);
     if (fork() > 0) {
+        close(newp[0]);
         // father
         int buffer = 0;
         while (read(p[0], &buffer, sizeof(buffer))) {
@@ -28,6 +30,8 @@ void childFunction(int p[2]) {
         }
         close(p[0]);
         close(newp[1]);
+        // why wait here?
+        wait(0);
     } else {
         // child
         close(p[0]);
@@ -64,7 +68,7 @@ main(int argc, char *argv[])
         // wive out all multiples of the prime
         // create a new pipe and a new child
         // until there are no more numbers in the pipe
-        close(p[1]);
+        
         childFunction(p);
     }
     exit(0);
