@@ -31,9 +31,10 @@ fmtname(char *path)
 
 
 void search(char *path, char *searchName) {
-    char buf[512], *p;
+    // char buf[512];
+    // char *p;
     int fd;
-    struct dirent de;
+    // struct dirent de;
     struct stat st;
 
     if((fd = open(path, 0)) < 0) {
