@@ -31,6 +31,7 @@ void childFunction(int p[2]) {
         close(p[0]);
         close(newp[1]);
         // why wait here?
+        // otherwise the child will be return to main, and exit
         wait(0);
     } else {
         // child
