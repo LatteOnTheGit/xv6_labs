@@ -16,7 +16,7 @@ void childFunction(int p[2]) {
         close(p[0]);
         exit(0);
     }
-    printf("prime: %d\n", prime);
+    printf("prime %d\n", prime);
     int newp[2];
     pipe(newp);
     if (fork() > 0) {
