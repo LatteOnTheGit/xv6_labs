@@ -6,7 +6,7 @@
 int
 main(int argc, char *argv[]) 
 {
-    char *buf[MAXARG];
+    char buf[MAXARG];
     // get standard input
     while (read(0, &buf, MAXARG) == 0) {}
 
