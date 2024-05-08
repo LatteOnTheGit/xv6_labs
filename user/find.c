@@ -53,8 +53,8 @@ void search(char *path, char *searchName) {
     if(strcmp(fmtname(path), searchName) == 0) {
     printf("%s\n", path);
     }
-    printf("%s\n", fmtname(path));
-    printf("%s\n", searchName);
+    // printf("%s\n", fmtname(path));
+    // printf("%s\n", searchName);
     break;
 
   case T_DIR:
