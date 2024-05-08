@@ -54,26 +54,26 @@ void search(char *path, char *searchName) {
     }
     break;
 
-  case T_DIR:
-    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-      printf("ls: path too long\n");
-      break;
-    }
-    strcpy(buf, path);
-    p = buf+strlen(buf);
-    *p++ = '/';
-    while(read(fd, &de, sizeof(de)) == sizeof(de)){
-      if(de.inum == 0)
-        continue;
-      memmove(p, de.name, DIRSIZ);
-      p[DIRSIZ] = 0;
-      if(stat(buf, &st) < 0){
-        printf("ls: cannot stat %s\n", buf);
-        continue;
-      }
-      search(buf, searchName);
-    }
-    break;
+//   case T_DIR:
+//     if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+//       printf("ls: path too long\n");
+//       break;
+//     }
+//     strcpy(buf, path);
+//     p = buf+strlen(buf);
+//     *p++ = '/';
+//     while(read(fd, &de, sizeof(de)) == sizeof(de)){
+//       if(de.inum == 0)
+//         continue;
+//       memmove(p, de.name, DIRSIZ);
+//       p[DIRSIZ] = 0;
+//       if(stat(buf, &st) < 0){
+//         printf("ls: cannot stat %s\n", buf);
+//         continue;
+//       }
+//       search(buf, searchName);
+//     }
+//     break;
   }
   close(fd);
 }
