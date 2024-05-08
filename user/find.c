@@ -31,10 +31,10 @@ fmtname(char *path)
 
 
 void search(char *path, char *searchName) {
-    // char buf[512];
-    // char *p;
+    char buf[512];
+    char *p;
     int fd;
-    // struct dirent de;
+    struct dirent de;
     struct stat st;
 
     if((fd = open(path, 0)) < 0) {
@@ -56,26 +56,26 @@ void search(char *path, char *searchName) {
     printf("%s\n", path);
     break;
 
-//   case T_DIR:
-//     if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-//       printf("ls: path too long\n");
-//       break;
-//     }
-//     strcpy(buf, path);
-//     p = buf+strlen(buf);
-//     *p++ = '/';
-//     while(read(fd, &de, sizeof(de)) == sizeof(de)){
-//       if(de.inum == 0)
-//         continue;
-//       memmove(p, de.name, DIRSIZ);
-//       p[DIRSIZ] = 0;
-//       if(stat(buf, &st) < 0){
-//         printf("ls: cannot stat %s\n", buf);
-//         continue;
-//       }
-//       search(buf, searchName);
-//     }
-//     break;
+  case T_DIR:
+    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+      printf("ls: path too long\n");
+      break;
+    }
+    strcpy(buf, path);
+    p = buf+strlen(buf);
+    *p++ = '/';
+    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+      if(de.inum == 0 || strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
+        continue;
+      memmove(p, de.name, DIRSIZ);
+      p[DIRSIZ] = 0;
+      if(stat(buf, &st) < 0){
+        printf("ls: cannot stat %s\n", buf);
+        continue;
+      }
+      search(buf, searchName);
+    }
+    break;
   }
   close(fd);
 }
