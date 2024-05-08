@@ -18,9 +18,9 @@ fmtname(char *path)
   // Return blank-padded name.
   if(strlen(p) >= DIRSIZ)
     return p;
-  memmove(buf, p, strlen(p));
+//   memmove(buf, p, strlen(p));
 //   memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
-  return buf;
+  return p;
 }
 
 // search in current directory
