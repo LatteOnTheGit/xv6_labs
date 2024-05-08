@@ -71,7 +71,7 @@ void search(char *path, char *searchName) {
         printf("ls: cannot stat %s\n", buf);
         continue;
       }
-      search(buf, search);
+      search(buf, searchName);
     }
     break;
   }
