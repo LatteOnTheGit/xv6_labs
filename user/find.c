@@ -54,6 +54,7 @@ void search(char *path, char *searchName) {
     printf("%s\n", path);
     }
     printf("%s\n", fmtname(path));
+    printf("%s\n", searchName);
     break;
 
   case T_DIR:
