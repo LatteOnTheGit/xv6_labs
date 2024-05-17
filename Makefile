@@ -150,7 +150,6 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_trace\
-	# Add $U/_sysinfotest to UPROGS in Makefile
 	$U/_sysinfotest\
 
 
