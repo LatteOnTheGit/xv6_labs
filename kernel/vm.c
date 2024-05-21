@@ -273,14 +273,30 @@ uvmdealloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
 void
 vmprint(pagetable_t pagetable)
 {
+  printf("page table %p\n", pagetable);
   // there are 2^9 = 512 PTEs in a page table.
   for(int i = 0; i < 512; i++){
     pte_t pte = pagetable[i];
     if((pte & PTE_V) == 1){
       // this PTE points to a lower-level page table.
-      printf("PTE %d: %p\n", i, pte);
       uint64 child = PTE2PA(pte);
-      vmprint((pagetable_t)child);
+      pagetable_t childpagetable_level1 = (pagetable_t)child;
+      printf("..%d: pte %p pa %p\n", i, pte, childpagetable_level1);
+      for(int i = 0; i < 512; i++) {
+        pte_t pte = childpagetable_level1[i];
+        if ((pte & PTE_V) == 1) {
+          uint64 child2 = PTE2PA(pte);
+          pagetable_t childpagetable_level2 = (pagetable_t)child;
+          printf(".. ..%d: pte %p pa %p\n", i, pte, childpagetable_level2);
+          for (int i = 0; i < 512; i++) {
+            pte_t pte = childpagetable_level2[i];
+            if ((pte & PTE_V) == 1) {
+              uint64 child3 = PTE2PA(pte);
+              printf(".. .. ..%d: pte %p pa %p\n", i, pte, child3);
+            }
+          }
+        }
+      }
     }
   }
 }
