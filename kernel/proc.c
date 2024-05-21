@@ -44,22 +44,6 @@ procinit(void)
   kvminithart();
 }
 
-// return number of proc whose state is not UNUSED
-uint64
-numproc(void)
-{
-  int count = 0;
-  struct proc *p;
-  for(p = proc; p < &proc[NPROC]; p++) {
-    acquire(&p->lock);
-    if(p->state != UNUSED) {
-      count++;
-    }
-    release(&p->lock);
-  }
-  return count;
-}
-
 // Must be called with interrupts disabled,
 // to prevent race with process being moved
 // to a different CPU.
@@ -166,7 +150,6 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
-  p->trapframe = 0;
 }
 
 // Create a user page table for a given process,
@@ -293,9 +276,6 @@ fork(void)
   np->sz = p->sz;
 
   np->parent = p;
-
-  // transfer trace mask from parent to child
-  np->trace_mask = p->trace_mask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -503,10 +483,14 @@ scheduler(void)
       }
       release(&p->lock);
     }
+#if !defined (LAB_FS)
     if(found == 0) {
       intr_on();
       asm volatile("wfi");
     }
+#else
+    ;
+#endif
   }
 }
 

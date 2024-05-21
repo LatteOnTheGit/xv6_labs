@@ -12,7 +12,6 @@
 #include "file.h"
 #include "stat.h"
 #include "proc.h"
-#include "sysinfo.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -101,23 +100,6 @@ filestat(struct file *f, uint64 addr)
   }
   return -1;
 }
-
-// the freemem field should be set to the number of bytes of free memory, and the nproc field should be set to the number of processes whose state is not UNUSED. 
-// int
-// file_info(struct file *f, uint64 addr)
-// {
-//   struct proc *p = myproc();
-//   struct sysinfo *si;
-//   if (f->type == FD_DEVICE) {
-//     si->freemem = amount_of_free_memory();
-//     si->nproc = numproc();
-//     if (copyout(p->pagetable, addr, (char *)si, sizeof(*si)) < 0) {
-//       return -1;
-//     }
-//     return 0;
-//   }
-//   return -1;
-// }
 
 // Read from file f.
 // addr is a user virtual address.
