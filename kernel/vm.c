@@ -286,7 +286,7 @@ vmprint(pagetable_t pagetable)
         pte_t pte = childpagetable_level1[i];
         if ((pte & PTE_V) == 1) {
           uint64 child2 = PTE2PA(pte);
-          pagetable_t childpagetable_level2 = (pagetable_t)child;
+          pagetable_t childpagetable_level2 = (pagetable_t)child2;
           printf(".. ..%d: pte %p pa %p\n", i, pte, childpagetable_level2);
           for (int i = 0; i < 512; i++) {
             pte_t pte = childpagetable_level2[i];
