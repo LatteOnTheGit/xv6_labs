@@ -111,7 +111,7 @@ exec(char *path, char **argv)
       last = s+1;
   safestrcpy(p->name, last, sizeof(p->name));
 
-  uvmunmap(p->kernelpgtbl, 0, PGROUNDUP(oldsz)/PGSIZE, 0);
+  kvmdealloc(p->kernelpgtbl, 0, PGROUNDUP(oldsz)/PGSIZE);
   kvmcopymappings(pagetable, p->kernelpgtbl, 0, sz);
     
   // Commit to the user image.
