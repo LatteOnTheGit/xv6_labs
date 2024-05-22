@@ -163,29 +163,59 @@ kvmmap(pagetable_t pgtbl,uint64 va, uint64 pa, uint64 sz, int perm)
 }
 
 // copy a mapping from src to dst.
+// int
+// kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz){
+//   pte_t *pte;
+//   uint64 pa, i;
+//   uint flags;
+
+//   for (i = PGROUNDUP(start); i<start+sz; i+= PGSIZE) {
+//     if ((pte = walk(src, i, 0)) == 0) {
+//       panic("kvmcopymappings: pte should exist");
+//     }
+//     if ((*pte & PTE_V) == 0) {
+//       panic("kvmcopymappings: page not present");
+//     }
+//     pa = PTE2PA(*pte);
+//     // set flags, make accessible in kernel pgtbl
+//     flags = PTE_FLAGS(*pte) & ~PTE_U;
+//     if (mappages(dst, i, PGSIZE, pa, flags) != 0) {
+//       goto err;
+//     }
+//   }
+//   err:
+//     uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
+//     return -1;
+// }
 int
-kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz){
+kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz)
+{
   pte_t *pte;
   uint64 pa, i;
   uint flags;
 
-  for (i = PGROUNDUP(start); i<start+sz; i+= PGSIZE) {
-    if ((pte = walk(src, i, 0)) == 0) {
+  // PGROUNDUP: prevent re-mapping already mapped pages (eg. when doing growproc)
+  for(i = PGROUNDUP(start); i < start + sz; i += PGSIZE){
+    if((pte = walk(src, i, 0)) == 0)
       panic("kvmcopymappings: pte should exist");
-    }
-    if ((*pte & PTE_V) == 0) {
+    if((*pte & PTE_V) == 0)
       panic("kvmcopymappings: page not present");
-    }
     pa = PTE2PA(*pte);
-    // set flags, make accessible in kernel pgtbl
+    // `& ~PTE_U` 表示将该页的权限设置为非用户页
+    // 必须设置该权限，RISC-V 中内核是无法直接访问用户页的。
     flags = PTE_FLAGS(*pte) & ~PTE_U;
-    if (mappages(dst, i, PGSIZE, pa, flags) != 0) {
+    if(mappages(dst, i, PGSIZE, pa, flags) != 0){
       goto err;
     }
   }
-  err:
-    uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
-    return -1;
+
+  return 0;
+
+ err:
+  // thanks @hdrkna for pointing out a mistake here.
+  // original code incorrectly starts unmapping from 0 instead of PGROUNDUP(start)
+  uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
+  return -1;
 }
 
 // translate a kernel virtual address to
