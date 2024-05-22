@@ -157,6 +157,12 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
+  void *kstatck_pa = (void*)kvmpa(p->kernelpgtbl,p->kstack);
+  kfree(kstatck_pa);
+  p->kstack = 0;
+
+  kvm_free_kernelpgtbl(p->kernelpgtbl);
+  p->kernelpgtbl = 0;
   p->state = UNUSED;
 }
 
