@@ -112,9 +112,9 @@ exec(char *path, char **argv)
   safestrcpy(p->name, last, sizeof(p->name));
 
   // kvmdealloc(p->kernelpgtbl, 0, PGROUNDUP(oldsz)/PGSIZE);
-  printf("in exec 1\n");
+  // printf("in exec 1\n");
   uvmunmap(p->kernelpgtbl, 0, PGROUNDUP(oldsz)/PGSIZE, 0);
-  printf("in exec 2\n");
+  // printf("in exec 2\n");
   kvmcopymappings(pagetable, p->kernelpgtbl, 0, sz);
     
   // Commit to the user image.
