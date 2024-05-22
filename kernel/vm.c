@@ -184,8 +184,8 @@ kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz){
     }
   }
   err:
-  uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
-  return -1;
+    uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
+    return -1;
 }
 
 // translate a kernel virtual address to
