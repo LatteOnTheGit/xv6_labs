@@ -226,3 +226,6 @@ int             sockread(struct sock *, uint64, int);
 int             sockwrite(struct sock *, uint64, int);
 void            sockrecvudp(struct mbuf*, uint32, uint16, uint16);
 #endif
+
+// vmcopyin.c
+int             copyin_new(pagetable_t, char *, uint64, uint64);
