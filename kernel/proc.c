@@ -126,7 +126,7 @@ found:
   if(pa == 0)
     panic("kalloc");
   uint64 va = KSTACK((int)0);
-  kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
+  kvmmap(p->kernelpgtbl,va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
   p->kstack = va;
 
   // Set up new context to start executing at forkret,
