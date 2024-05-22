@@ -169,7 +169,7 @@ kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz){
   uint64 pa, i;
   uint flags;
 
-  for (i = PGROUNDDOWN(start); i<start+sz; i+= PGSIZE) {
+  for (i = PGROUNDUP(start); i<start+sz; i+= PGSIZE) {
     if ((pte = walk(src, i, 0)) == 0) {
       panic("kvmcopymappings: pte should exist");
     }
@@ -184,7 +184,7 @@ kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz){
     }
   }
   err:
-  uvmunmap(dst, PGROUNDDOWN(start), (i - PGROUNDDOWN(start)) / PGSIZE, 0);
+  uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
   return -1;
 }
 
