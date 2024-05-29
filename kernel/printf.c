@@ -144,7 +144,7 @@ backtrace()
   // // ra at -8 offset from fp
   // ra = *(uint64*)(fp - 8);
   printf("backtrace:\n");
-  while (fp <= stackTop) {
+  while (fp > stackTop) {
     // ra at -8 offset from fp
     ra = *(uint64*)(fp - 8);
     printf("%p\n", ra);
