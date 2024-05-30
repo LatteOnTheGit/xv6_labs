@@ -99,6 +99,10 @@ sys_uptime(void)
 uint64
 sys_sigreturn(void)
 {
+  struct proc *p = myproc();
+  p->trapframe->epc = p->ticksaveepc;
+  p->kstack = p->ticksavekstack;
+  usertrapret();
   return 0;
 }
 
