@@ -127,6 +127,11 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  // init alarm state in proc struct
+  p->alarminterval = 0;
+  p->handler = 0;
+  p->ticks = 0;
+
   return p;
 }
 
