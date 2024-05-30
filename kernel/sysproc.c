@@ -114,4 +114,5 @@ sys_sigalarm(void)
   myproc()->alarminterval = n;
   myproc()->handler = p;
   myproc()->ticks = 0;
+  return 0;
 }
