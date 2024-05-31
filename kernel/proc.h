@@ -106,6 +106,6 @@ struct proc {
   int alarminterval;           // Alarm interval
   uint64 handler;              // Address of signal handler
   int ticks;                   // Ticks since start
-  uint64 ticksaveepc;          // Saved epc for alarm
-  uint64 ticksavekstack;       // Saved kstack for alarm
+  struct trapframe *alarm_trapframe; // data page for alarm trampoline.S
+  int alarm_goingoff;          // Alarm going off
 };

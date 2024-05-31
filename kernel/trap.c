@@ -81,10 +81,13 @@ usertrap(void)
     if (p->alarminterval > 0) {
       p->ticks++;
       if (p->ticks >= p->alarminterval) {
-        p->ticks = 0;
-        p->ticksaveepc = p->trapframe->epc;
-        p->ticksavekstack = p->kstack;
-        p->trapframe->epc = p->handler;
+        if (p->alarm_goingoff) {
+          p->ticks = 0;
+          *p->alarm_trapframe = *p->trapframe;
+          p->trapframe->epc = p->handler;
+          p->alarm_goingoff = 1;
+        }
+        
       }
     }
     
