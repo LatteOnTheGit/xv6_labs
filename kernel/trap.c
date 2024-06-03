@@ -68,6 +68,7 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else if(r_scause() == 13 || r_scause() == 15) {
+    printf("page fault\n");
     char *mem;
     uint64 va = r_stval();
     va = PGROUNDDOWN(va);
