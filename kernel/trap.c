@@ -78,7 +78,7 @@ usertrap(void)
     va = PGROUNDDOWN(va);
     mem = kalloc();
     if(mem == 0){
-      kill(p -> pid);
+      // kill(p -> pid);
       return;
     }
     memset(mem, 0, PGSIZE);
