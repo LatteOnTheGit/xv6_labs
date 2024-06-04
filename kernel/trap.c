@@ -70,23 +70,7 @@ usertrap(void)
   } else {
     uint64 va = r_stval();
     if((r_scause() == 13 || r_scause() == 15) && uvmshouldtouch(va)) {
-      // printf("page fault\n");
-      char *mem;
-      
-      va = PGROUNDDOWN(va);
-      mem = kalloc();
-      if(mem == 0){
-        kill(p -> pid);
-        return;
-      }
-      memset(mem, 0, PGSIZE);
-      if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
-        kfree(mem);
-        kill(p -> pid);
-        // uvmdealloc(pagetable, a, oldsz);
-        return;
-      }
-      return;
+      uvmtouch(va);
     } else {
       printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
       printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
