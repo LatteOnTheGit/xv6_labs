@@ -462,10 +462,6 @@ int uvmshouldtouch(uint64 va) {
 void uvmtouch(uint64 va) {
     char *mem;
     struct proc *p = myproc();
-    if (va >= p->sz) {
-      kill(p -> pid);
-      return;
-    }
     va = PGROUNDDOWN(va);
     mem = kalloc();
     if(mem == 0){
