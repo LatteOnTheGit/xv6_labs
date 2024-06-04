@@ -73,7 +73,7 @@ usertrap(void)
       if (uvmshouldtouch(va)) {
         uvmtouch(va);
       } else {
-        p->killed = 1;
+        kill(p->pid);
       }
       
     } else {

@@ -59,7 +59,7 @@ sys_sbrk(void)
   if (n > 0) {
     myproc()->sz += n;
   } else {
-    if (myproc()->sz + n < 0) return -1;
+    if (myproc()->sz + n <= 0) return -1;
     else {
       myproc()->sz = uvmdealloc(p->pagetable, p->sz, p->sz+n);
     }
