@@ -49,12 +49,21 @@ sys_sbrk(void)
   if(argint(0, &n) < 0)
     return -1;
   addr = myproc()->sz;
-  if (n < 0) {
-    uvmdealloc(p->pagetable, p->sz, p->sz+n);
+  // if (n < 0) {
+  //   uvmdealloc(p->pagetable, p->sz, p->sz+n);
+  // }
+  // // if(growproc(n) < 0)
+  // //   return -1;
+  // myproc()->sz = addr + n;
+
+  if (n > 0) {
+    myproc()->sz += n;
+  } else {
+    if (myproc()->sz + n < 0) return -1;
+    else {
+      myproc()->sz = uvmdealloc(p->pagetable, p->sz, p->sz+n);
+    }
   }
-  // if(growproc(n) < 0)
-  //   return -1;
-  myproc()->sz = addr + n;
   return addr;
 }
 
