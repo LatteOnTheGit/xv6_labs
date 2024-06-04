@@ -452,7 +452,7 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
 
 // whether a page is previously lazy-allocated and needed to be touched before use.
 int uvmshouldtouch(uint64 va) {
-  pte_t *pte;
+  // pte_t *pte;
   struct proc *p = myproc();
   if (va < PGROUNDDOWN(p->trapframe->sp) && va >= PGROUNDDOWN(p->trapframe->sp) - PGSIZE) {
     return 0;
