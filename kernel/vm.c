@@ -103,12 +103,13 @@ walkaddr(pagetable_t pagetable, uint64 va)
     return 0;
 
   pte = walk(pagetable, va, 0);
-  if(pte == 0)
-    return 0;
-  if((*pte & PTE_V) == 0)
-    return 0;
-  if((*pte & PTE_U) == 0)
-    return 0;
+  if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0) {
+    if (uvmshouldtouch(va)) {
+      uvmtouch(va);
+    } else {
+      return 0;
+    }
+  }
   pa = PTE2PA(*pte);
   return pa;
 }
