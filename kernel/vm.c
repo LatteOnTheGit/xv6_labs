@@ -458,8 +458,8 @@ int uvmshouldtouch(uint64 va) {
     return 0;
   }
   return va < p->sz // within size of memory for the process
-    && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
-    && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
+    // && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
+    // && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
 }
 
 void uvmtouch(uint64 va) {
