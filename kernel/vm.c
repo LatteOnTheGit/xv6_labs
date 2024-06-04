@@ -468,12 +468,12 @@ void uvmtouch(uint64 va) {
     va = PGROUNDDOWN(va);
     mem = kalloc();
     if(mem == 0){
-      kill(p -> pid);
+      p->killed = 1;
     }
     memset(mem, 0, PGSIZE);
     if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
       kfree(mem);
-      kill(p -> pid);
+      p->killed = 1;
       // uvmdealloc(pagetable, a, oldsz);
     }
 }
