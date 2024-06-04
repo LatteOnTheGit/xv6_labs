@@ -71,7 +71,7 @@ usertrap(void)
     printf("page fault\n");
     char *mem;
     uint64 va = r_stval();
-    if (va >= p->sz || va <= (uint64)0xffffffffffffffffL) {
+    if (va > p->sz || va <= (uint64)0xffffffffffffffffL) {
       kill(p -> pid);
       return;
     }
