@@ -69,8 +69,12 @@ usertrap(void)
     // ok
   } else {
     uint64 va = r_stval();
-    if((r_scause() == 13 || r_scause() == 15) && uvmshouldtouch(va)) {
-      uvmtouch(va);
+    if(r_scause() == 13 || r_scause() == 15) {
+      if (va<MAXVA && uvmshouldtouch(va)) {
+        uvmtouch(va);
+        return;
+      }
+      kill(p->pid);
     } else {
       printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
       printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
