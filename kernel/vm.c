@@ -454,7 +454,7 @@ int uvmshouldtouch(uint64 va) {
   pte_t *pte;
   struct proc *p = myproc();
   
-  return va < p->sz // within size of memory for the process
+  return p->sz < MAXVA && va < p->sz // within size of memory for the process
     && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
     && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
 }
