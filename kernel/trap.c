@@ -73,10 +73,6 @@ usertrap(void)
       // printf("page fault\n");
       char *mem;
       
-      if (va >= p->sz) {
-        kill(p -> pid);
-        return;
-      }
       va = PGROUNDDOWN(va);
       mem = kalloc();
       if(mem == 0){
