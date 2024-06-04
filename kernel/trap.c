@@ -70,7 +70,7 @@ usertrap(void)
   } else {
     uint64 va = r_stval();
     if(r_scause() == 13 || r_scause() == 15) {
-      if (va<MAXVA && uvmshouldtouch(va)) {
+      if (uvmshouldtouch(va)) {
         uvmtouch(va);
         return;
       }
