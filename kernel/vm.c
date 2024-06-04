@@ -360,9 +360,9 @@ int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
-  if (uvmshouldtouch(dstva)) {
-    uvmtouch(dstva);
-  }
+  // if (uvmshouldtouch(dstva)) {
+  //   uvmtouch(dstva);
+  // }
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
     pa0 = walkaddr(pagetable, va0);
@@ -387,9 +387,9 @@ int
 copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
 {
   uint64 n, va0, pa0;
-  if (uvmshouldtouch(srcva)) {
-    uvmtouch(srcva);
-  }
+  // if (uvmshouldtouch(srcva)) {
+  //   uvmtouch(srcva);
+  // }
   while(len > 0){
     va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
