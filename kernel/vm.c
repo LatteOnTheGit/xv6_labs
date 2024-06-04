@@ -454,9 +454,10 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
 int uvmshouldtouch(uint64 va) {
   pte_t *pte;
   struct proc *p = myproc();
-  
+  if (va < PGROUNDDOWN(p->trapframe->sp) && va >= PGROUNDDOWN(p->trapframe->sp) - PGSIZE) {
+    return 0;
+  }
   return va < p->sz // within size of memory for the process
-    && va > p->trapframe->sp // not accessing trapframe
     && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
     && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
 }
