@@ -41,29 +41,41 @@ sys_wait(void)
 uint64
 sys_sbrk(void)
 {
+  // int addr;
+  // int n;
+  // struct proc *p = myproc();
+  
+
+  // if(argint(0, &n) < 0)
+  //   return -1;
+  // addr = myproc()->sz;
+  // // if (n < 0) {
+  // //   uvmdealloc(p->pagetable, p->sz, p->sz+n);
+  // // }
+  // // // if(growproc(n) < 0)
+  // // //   return -1;
+  // // myproc()->sz = addr + n;
+
+  // if (n > 0) {
+  //   myproc()->sz += n;
+  // } else {
+  //   if (myproc()->sz + n <= 0) return -1;
+  //   else {
+  //     myproc()->sz = uvmdealloc(p->pagetable, p->sz, p->sz+n);
+  //   }
+  // }
+  // return addr;
+
   int addr;
   int n;
   struct proc *p = myproc();
-  
-
   if(argint(0, &n) < 0)
     return -1;
-  addr = myproc()->sz;
-  // if (n < 0) {
-  //   uvmdealloc(p->pagetable, p->sz, p->sz+n);
-  // }
-  // // if(growproc(n) < 0)
-  // //   return -1;
-  // myproc()->sz = addr + n;
-
-  if (n > 0) {
-    myproc()->sz += n;
-  } else {
-    if (myproc()->sz + n <= 0) return -1;
-    else {
-      myproc()->sz = uvmdealloc(p->pagetable, p->sz, p->sz+n);
-    }
+  addr = p->sz;
+  if(n < 0) {
+    uvmdealloc(p->pagetable, p->sz, p->sz+n); // 如果是缩小空间，则马上释放
   }
+  p->sz += n; // 懒分配
   return addr;
 }
 

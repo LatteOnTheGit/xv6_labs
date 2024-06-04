@@ -452,28 +452,43 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
 
 // whether a page is previously lazy-allocated and needed to be touched before use.
 int uvmshouldtouch(uint64 va) {
-  // pte_t *pte;
+  pte_t *pte;
   struct proc *p = myproc();
-  if (va < PGROUNDDOWN(p->trapframe->sp) && va >= PGROUNDDOWN(p->trapframe->sp) - PGSIZE) {
-    return 0;
-  }
-  return va < p->sz; // within size of memory for the process
-    // && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
-    // && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
+  // if (va < PGROUNDDOWN(p->trapframe->sp) && va >= PGROUNDDOWN(p->trapframe->sp) - PGSIZE) {
+  //   return 0;
+  // }
+  return va < p->sz // within size of memory for the process
+    && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
+    && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
 }
 
 void uvmtouch(uint64 va) {
-    char *mem;
-    struct proc *p = myproc();
-    va = PGROUNDDOWN(va);
-    mem = kalloc();
-    if(mem == 0){
-      p->killed = 1;
-    }
+    // char *mem;
+    // struct proc *p = myproc();
+    // va = PGROUNDDOWN(va);
+    // mem = kalloc();
+    // if(mem == 0){
+    //   p->killed = 1;
+    // }
+    // memset(mem, 0, PGSIZE);
+    // if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+    //   kfree(mem);
+    //   p->killed = 1;
+    //   // uvmdealloc(pagetable, a, oldsz);
+    // }
+
+  struct proc *p = myproc();
+  char *mem = kalloc();
+  if(mem == 0) {
+    // failed to allocate physical memory
+    printf("lazy alloc: out of memory\n");
+    p->killed = 1;
+  } else {
     memset(mem, 0, PGSIZE);
-    if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+    if(mappages(p->pagetable, PGROUNDDOWN(va), PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+      printf("lazy alloc: failed to map page\n");
       kfree(mem);
       p->killed = 1;
-      // uvmdealloc(pagetable, a, oldsz);
     }
+  }
 }
