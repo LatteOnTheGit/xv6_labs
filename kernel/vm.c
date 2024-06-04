@@ -5,6 +5,8 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "spinlock.h"
+#include "proc.h"
 
 /*
  * the kernel's page table.
@@ -317,9 +319,9 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
-      panic("uvmcopy: pte should exist");
-    // if((*pte & PTE_V) == 0)
-    //   panic("uvmcopy: page not present");
+      continue;
+    if((*pte & PTE_V) == 0)
+      continue;
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
@@ -357,7 +359,9 @@ int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
-
+  if (uvmshouldtouch(dstva)) {
+    uvmtouch(dstva);
+  }
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
     pa0 = walkaddr(pagetable, va0);
@@ -382,7 +386,9 @@ int
 copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
 {
   uint64 n, va0, pa0;
-
+  if (uvmshouldtouch(srcva)) {
+    uvmtouch(srcva);
+  }
   while(len > 0){
     va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
@@ -441,4 +447,37 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+
+// whether a page is previously lazy-allocated and needed to be touched before use.
+int uvmshouldtouch(uint64 va) {
+  pte_t *pte;
+  struct proc *p = myproc();
+  
+  return va < p->sz // within size of memory for the process
+    && PGROUNDDOWN(va) != r_sp() // not accessing stack guard page (it shouldn't be mapped)
+    && (((pte = walk(p->pagetable, va, 0))==0) || ((*pte & PTE_V)==0)); // page table entry does not exist
+}
+
+void uvmtouch(uint64 va) {
+    char *mem;
+    struct proc *p = myproc();
+    if (va >= p->sz) {
+      kill(p -> pid);
+      return;
+    }
+    va = PGROUNDDOWN(va);
+    mem = kalloc();
+    if(mem == 0){
+      kill(p -> pid);
+      return;
+    }
+    memset(mem, 0, PGSIZE);
+    if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+      kfree(mem);
+      kill(p -> pid);
+      // uvmdealloc(pagetable, a, oldsz);
+      return;
+    }
+    return;
 }

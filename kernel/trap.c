@@ -67,32 +67,37 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
-  } else if(r_scause() == 13 || r_scause() == 15) {
-    // printf("page fault\n");
-    char *mem;
-    uint64 va = r_stval();
-    if (va >= p->sz) {
-      kill(p -> pid);
-      return;
-    }
-    va = PGROUNDDOWN(va);
-    mem = kalloc();
-    if(mem == 0){
-      kill(p -> pid);
-      return;
-    }
-    memset(mem, 0, PGSIZE);
-    if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
-      kfree(mem);
-      // uvmdealloc(pagetable, a, oldsz);
-      return;
-    }
-
   } else {
-    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-    p->killed = 1;
+    uint64 va = r_stval();
+    if((r_scause() == 13 || r_scause() == 15) && uvmshouldtouch(va)) {
+      // printf("page fault\n");
+      char *mem;
+      
+      if (va >= p->sz) {
+        kill(p -> pid);
+        return;
+      }
+      va = PGROUNDDOWN(va);
+      mem = kalloc();
+      if(mem == 0){
+        kill(p -> pid);
+        return;
+      }
+      memset(mem, 0, PGSIZE);
+      if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+        kfree(mem);
+        kill(p -> pid);
+        // uvmdealloc(pagetable, a, oldsz);
+        return;
+      }
+      return;
+    } else {
+      printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+      printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+      p->killed = 1;
   }
+
+  } 
 
   if(p->killed)
     exit(-1);
