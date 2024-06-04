@@ -71,10 +71,10 @@ usertrap(void)
     printf("page fault\n");
     char *mem;
     uint64 va = r_stval();
-    // if (va >= p->sz || va <= (uint64)0xffffffffffffffffL) {
-    //   kill(p -> pid);
-    //   return;
-    // }
+    if (va >= p->sz) {
+      kill(p -> pid);
+      return;
+    }
     va = PGROUNDDOWN(va);
     mem = kalloc();
     if(mem == 0){
