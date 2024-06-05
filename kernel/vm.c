@@ -463,32 +463,32 @@ int uvmshouldtouch(uint64 va) {
 }
 
 void uvmtouch(uint64 va) {
-    // char *mem;
-    // struct proc *p = myproc();
-    // va = PGROUNDDOWN(va);
-    // mem = kalloc();
-    // if(mem == 0){
-    //   p->killed = 1;
-    // }
-    // memset(mem, 0, PGSIZE);
-    // if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
-    //   kfree(mem);
-    //   p->killed = 1;
-    //   // uvmdealloc(pagetable, a, oldsz);
-    // }
-
-  struct proc *p = myproc();
-  char *mem = kalloc();
-  if(mem == 0) {
-    // failed to allocate physical memory
-    printf("lazy alloc: out of memory\n");
-    p->killed = 1;
-  } else {
-    memset(mem, 0, PGSIZE);
-    if(mappages(p->pagetable, PGROUNDDOWN(va), PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
-      printf("lazy alloc: failed to map page\n");
-      kfree(mem);
+    char *mem;
+    struct proc *p = myproc();
+    va = PGROUNDDOWN(va);
+    mem = kalloc();
+    if(mem == 0){
       p->killed = 1;
     }
-  }
+    memset(mem, 0, PGSIZE);
+    if(mappages(myproc() -> pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+      kfree(mem);
+      p->killed = 1;
+      // uvmdealloc(pagetable, a, oldsz);
+    }
+
+  // struct proc *p = myproc();
+  // char *mem = kalloc();
+  // if(mem == 0) {
+  //   // failed to allocate physical memory
+  //   printf("lazy alloc: out of memory\n");
+  //   p->killed = 1;
+  // } else {
+  //   memset(mem, 0, PGSIZE);
+  //   if(mappages(p->pagetable, PGROUNDDOWN(va), PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+  //     printf("lazy alloc: failed to map page\n");
+  //     kfree(mem);
+  //     p->killed = 1;
+  //   }
+  // }
 }
