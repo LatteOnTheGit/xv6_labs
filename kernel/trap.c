@@ -69,7 +69,7 @@ usertrap(void)
     // ok
   } else {
     uint64 va = r_stval();
-    if ((r_scause == 13 || r_scause == 15) && (touch_check(va))) {
+    if ((r_scause() == 13 || r_scause() == 15) && (touch_check(va))) {
       // this is cow fork page fault
       if (touch(va) == -1) {
         p->killed = 1;
