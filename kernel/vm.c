@@ -483,7 +483,6 @@ int touch(uint64 va) {
   // todo: handle parent/child page table(PTE_write)
   struct proc *p = myproc();
   uint64 pa;
-  char *mem;
   pte_t *pte;
   
   // set va PTE write to 1
