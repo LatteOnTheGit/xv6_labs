@@ -5,6 +5,8 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "spinlock.h"
+#include "proc.h"
 
 /*
  * the kernel's page table.
@@ -348,12 +350,16 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
       panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
     // disable write for both new and old pages
-    *pte &= ~PTE_W;
+    if (*pte & PTE_W) {
+      *pte = (*pte & ~PTE_W) | PTE_RSW;
+    }
     // flags = PTE_FLAGS(*pte);
-    flags = PTE_FLAGS(*pte) & ~PTE_W;
+    flags = PTE_FLAGS(*pte);
+
     if(mappages(new, i, PGSIZE, pa, flags) != 0){
       goto err;
     }
+    krefpage((void*)pa);
   }
   return 0;
 
@@ -384,6 +390,9 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
   uint64 n, va0, pa0;
 
   while(len > 0){
+    if (touch_check(dstva)) {
+      touch(dstva);
+    }
     va0 = PGROUNDDOWN(dstva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
@@ -467,3 +476,66 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+int touch(uint64 va) {
+  // allocate new pa, copy data from old pa to new pa
+  // set write to 1
+  // todo: handle parent/child page table(PTE_write)
+  struct proc *p = myproc();
+  uint64 pa;
+  char *mem;
+  pte_t *pte;
+  
+  // set va PTE write to 1
+  if ((pte = walk(p->pagetable, va, 0)) == 0) {
+    panic("touch: walk");
+  }
+  pa = PTE2PA(*pte);
+
+  uint64 new = (uint64)kcopy_n_deref((void*)pa);
+  if (new == 0) {
+    return -1;
+  }
+  uint64 flags = (PTE_FLAGS(*pte) | PTE_W) & ~PTE_RSW;
+  uvmunmap(p->pagetable, PGROUNDDOWN(va), 1, 0); // unmap old pa
+  // map to new pa
+  if (mappages(p->pagetable, va, 1, new, flags) != 0) {
+    panic("touch: mappages");
+  }
+  return 0;
+}
+
+int touch_check(uint64 va) {
+  struct proc *p = myproc();
+  pte_t *pte;
+  return va < p->sz && ((pte = walk(p->pagetable, va, 0)) != 0) && (*pte & PTE_V) && (*pte & PTE_RSW);
+}
+
+// uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
+// {
+//   pte_t *pte;
+//   uint64 pa, i;
+//   uint flags;
+//   char *mem;
+
+//   for(i = 0; i < sz; i += PGSIZE){
+//     if((pte = walk(old, i, 0)) == 0)
+//       panic("uvmcopy: pte should exist");
+//     if((*pte & PTE_V) == 0)
+//       panic("uvmcopy: page not present");
+//     pa = PTE2PA(*pte);
+//     flags = PTE_FLAGS(*pte);
+//     if((mem = kalloc()) == 0)
+//       goto err;
+//     memmove(mem, (char*)pa, PGSIZE);
+//     if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
+//       kfree(mem);
+//       goto err;
+//     }
+//   }
+//   return 0;
+
+//  err:
+//   uvmunmap(new, 0, i / PGSIZE, 1);
+//   return -1;
+// }
