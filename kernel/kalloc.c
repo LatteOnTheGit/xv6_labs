@@ -84,6 +84,9 @@ kalloc(void)
     kmem.freelist[cpu_id] = r->next;
   } else {
     for (int i = 0; i < NCPU; i++) {
+      if (i == cpu_id) {
+        continue;
+      }
       acquire(&kmem.lock[i]);
       r = kmem.freelist[i];
       if(r) {
