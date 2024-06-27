@@ -98,7 +98,7 @@ kalloc(void)
     }
   }
   release(&kmem.lock[cpu_id]);
-
+  pop_off();
   if(r)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
