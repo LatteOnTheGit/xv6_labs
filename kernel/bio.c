@@ -24,6 +24,7 @@
 #include "buf.h"
 
 #define NBUFMAP_BUCKET 13
+#define BUFMAP_HASH(dev, blockno) ((((dev)<<27)|(blockno)) % NBUFMAP_BUCKET)
 
 struct {
   // struct spinlock lock;
