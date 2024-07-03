@@ -508,7 +508,7 @@ sys_pipe(void)
 }
 
 uint64
-symlink(void){
+sys_symlink(void){
   char target[MAXPATH], path[MAXPATH];
   struct inode *ip;
 
