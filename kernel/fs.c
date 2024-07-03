@@ -412,14 +412,14 @@ bmap(struct inode *ip, uint bn)
         a[bn / NINDIRECT] = addr = balloc(ip->dev);
         log_write(bp);
       }
-    
+    brelse(bp);
     bp2 = bread(ip->dev, addr);
     a2 = (uint*)bp2->data;
     if ((addr = a2[bn % NINDIRECT]) == 0) {
       a2[bn % NINDIRECT] = addr = balloc(ip->dev);
       log_write(bp2);
     }
-    brelse(bp);
+    
     brelse(bp2);
     return addr;
   }
