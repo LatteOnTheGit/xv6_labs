@@ -190,3 +190,4 @@ void            virtio_disk_intr(void);
 
 // sysfile
 int vmatrylazytouch(uint64 va);
+struct vma *findvma(struct proc *p, uint64 va);
