@@ -308,7 +308,7 @@ fork(void)
     struct vma *v = &p->vmas[i];
     if (v->valid) {
       np->vmas[i] = *v;
-      fileup(v->f);
+      filedup(v->f);
     }
   }
 
